@@ -1,0 +1,56 @@
+/* Import @paalstack/react-ui styles first so Tailwind can override them */
+@import '@paalstack/react-ui/styles-scoped.css';
+@import '@paalstack/react-ui/theme.css';
+
+/* Import Tailwind after library styles for proper override capability */
+
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+
+@layer utilities {
+  .app,
+  [data-base-ui-portal] {
+    @tailwind utilities;
+  }
+}
+
+@source '../../node_modules/@paalstack/react-ui';
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
+
+@utility container {
+  @apply mx-auto px-4;
+  @variant lg {
+    @apply max-w-6xl;
+  }
+}
+
+@theme {
+  --breakpoint-xl: 1440px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-md: 992px;
+  --breakpoint-sm: 768px;
+  --breakpoint-xs: 481px;
+}
+
+@layer base {
+  :root {
+    --success: oklch(0.5273 0.1371 150.07);
+    --success-foreground: oklch(0.9819 0.0181 155.83);
+
+    --danger: oklch(0.5054 0.1905 27.52);
+    --danger-foreground: oklch(1 0 0);
+
+    --warning: oklch(0.5534 0.1739 38.4);
+    --warning-foreground: oklch(0.9796 0.0158 73.68);
+
+    --info: oklch(0.5293 0.1779 256.12);
+    --info-foreground: oklch(0.9786 0.0109 243.65);
+  }
+}

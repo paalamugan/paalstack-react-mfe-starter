@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" id="favIcon" href="/favicon.ico" />
+
+  <!-- CUSTOMIZE: Update this title for your application -->
+  <title>Paalstack React MFE Starter</title>
+
+  <!-- SystemJS - Required for Single-SPA module federation -->
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.15.1/dist/system.min.js"></script>
+
+  <!-- 
+    SystemJS Import Map — Maps remote module names to their URLs.
+    The <%= sharedRemoteUrl %> variable is replaced at build time by vite-plugin-html.
+    
+    Configure VITE_SHARED_REMOTE_URL in your .env file:
+    VITE_SHARED_REMOTE_URL=http://your-server:port/assets/remoteEntry.js
+    
+    Add more remote modules below as needed:
+    "anotherApp": "http://localhost:9003/assets/remoteEntry.js"
+  -->
+  <script type="systemjs-importmap">
+    {
+      "imports": {
+        "shared": "<%= sharedRemoteUrl %>"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <!-- Root element where React app will mount -->
+  <div id="root" class="app"></div>
+
+  <!-- Main entry point - Vite will process this in development -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Production mode detection and SystemJS loader -->
+  <script>
+    /**
+     * Detects if running in production/preview mode and loads the
+     * appropriate SystemJS bundle. In development Vite handles module loading.
+     */
+    const isProduction = (function () {
+      if (window.location.pathname.includes('/dist/')) return true;
+      if (document.querySelector('script[src*="/assets/index-"]') !== null) return true;
+      if (document.querySelector('link[href*="/assets/index-"][rel="modulepreload"]') !== null) return true;
+      if (window.__vite_plugin_react_time__ || document.querySelector('script[src="/@vite/client"]')) {
+        return false;
+      }
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+      if (hostname === 'localhost' && (port === '9001' || port === '5173')) {
+        return document.querySelector('script[src*="index-"]') !== null;
+      }
+      return false;
+    })();
+
+    if (isProduction && typeof System !== 'undefined') {
+      const moduleScript = document.querySelector('script[src*="/assets/index-"]');
+      const preloadLink = document.querySelector('link[href*="/assets/index-"][rel="modulepreload"]');
+
+      let entryFile = null;
+      if (moduleScript) {
+        entryFile = moduleScript.getAttribute('src');
+      } else if (preloadLink) {
+        entryFile = preloadLink.getAttribute('href');
+      } else {
+        const scripts = document.querySelectorAll('script[src*="/assets/index-"]');
+        if (scripts.length > 0) {
+          entryFile = scripts[0].getAttribute('src');
+        }
+      }
+
+      if (entryFile) {
+        System.import(entryFile).catch(function (err) {
+          console.error('Error loading SystemJS module:', err);
+        });
+      } else {
+        console.warn('Could not find SystemJS entry file. Make sure the build completed successfully.');
+      }
+    }
+  </script>
+</body>
+
+</html>
